@@ -51,8 +51,10 @@ services:
     volumes:
       - ${DOCKERDIR}/duckdns/appdata/config:/config #optional
     restart: unless-stopped
+
   # WireGuard - VPN provider
   wireguard:
+    depends_on: [ unbound, pihole ]
     image: lscr.io/linuxserver/wireguard
     container_name: wireguard
     # mac_address: d0:ca:ab:cd:ef:03
@@ -66,9 +68,8 @@ services:
       - SERVERURL=$DuckDNSSUBDOMAIN
       - SERVERPORT=51820
       - PEERS=7
-      - PEERDNS=auto
+      - PEERDNS=${PIHOLE_MACVLAN_IP}
       - INTERNAL_SUBNET=10.13.13.0 #Only change if it conflicts
-      - ALLOWEDIPS=0.0.0.0/0
     volumes:
       - ${DOCKERDIR}/wireguard/config:/config
       - /lib/modules:/lib/modules
@@ -76,6 +77,9 @@ services:
       - 51820:51820/udp
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
+    dns:
+      - ${PIHOLE_MACVLAN_IP} # Points to pihole
+      - ${UNBOUND_MACVLAN_IP} # Points to unbound
     networks:
       macvlan:
         ipv4_address: ${WIREGUARD_MACVLAN_IP}
@@ -83,6 +87,7 @@ services:
 
   # Pihole - Ads Blocker
   pihole:
+    depends_on: [ unbound ]
     container_name: pihole
     image: pihole/pihole:latest
     hostname: pi-hole
@@ -109,7 +114,7 @@ services:
 
   # Unbound
   unbound:
-    container_name: unboundn
+    container_name: unbound
     image: mvance/$UnboundImage:latest
     hostname: syn-unbound
     # mac_address: d0:ca:ab:cd:ef:02
