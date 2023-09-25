@@ -1,5 +1,4 @@
 # PiHole + Undound + Wireguard + Portainer + ResilioSync
-## PiHole is NOT WORKING
 
 ## PreInstall steps:
 - run ```docker-install.sh```
@@ -24,6 +23,14 @@
     1. Add list from https://firebog.net/
     2. Change Router DNS to manual -> ipv4 = $PiHoleIP (1.1.1.1 as secondary)
     3. Change PiHole WebUI -> setting -> DNS -> $UnboundIP#5335
+
+## Internet Connectivity Issue:
+### configuring Wireguard:
+
+change  "PostUp" and "PostDown" parameter in ./appdata/wireguard/config/wg0.conf with the following
+    - ```PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth+ -j MASQUERADE```
+    - ```PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth+ -j MASQUERADE```
+
 
 
 
