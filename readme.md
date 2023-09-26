@@ -1,5 +1,7 @@
 # PiHole + Undound + Wireguard + Portainer + ResilioSync
 
+# Wireguard config isn't set properly and not yet working outside LAN
+
 ## PreInstall steps:
 - run ```docker-install.sh```
 - verify docker installation
